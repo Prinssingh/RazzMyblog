@@ -1,0 +1,132 @@
+{% extends "Author/Author.html" %}
+{% block page_title %}PERSONAL BLOGS{% endblock %}
+{% block current_page%}Personal Blogs{% endblock %}
+{% block admin_main_content %}
+{% load tags %}
+<style>
+td{font-weight: bold;}
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="white-box">
+            <h3 class="box-title">MY BLOGS</h3>
+            <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <div class="white-box">
+                            <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
+                                <select class="form-control pull-right row b-none">
+                                    <option>March 2019</option>
+                                    <option>April 2019</option>
+                                    <option>May 2019</option>
+                                    <option>June 2019</option>
+                                    <option>July 2019</option>
+                                </select>
+                            </div>
+                            <h3 class="box-title">My Blogs</h3>
+                            <div class="table-responsive">
+                                <table class="table table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>TITTLE</th>
+                                            <th>DATE</th>
+                                            <th>LIKES</th>
+                                            <th>VIWES</th>
+                                            <th>STATUS</th>
+                                            <th>OPTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if posts %}
+                                        {% for post in posts %}
+                                            <tr>
+                                                <td>{{forloop.counter}}</td>
+                                                <td class="txt-oflo">{% if post.title|length < 55 %}{{post.title}}
+                                                
+                                                {% else %}{{post.title |truncatechars:55}}...
+                                                {% endif %}</td>
+                                                <td class="txt-oflo">{{post.created_on}}</td>
+                                                <td class="text-success"> <center>{{post.getLikes}}</center></td>
+                                                <td class="text-warning"> <center> {{post.views}}</center></td>
+                                                <td class="text-{% if  post.status == "Pending" %}warning{% elif post.status == "Approved"%}success{% elif post.status == "Rejected"%}danger{% else %}primary{% endif %} ">{{post.status}}</td>
+                                                <td><a href="{% url 'Author:Editblog' post.id %}"><span class="text-success fa fa-edit" style="font-size:24px; "></span></a>
+                                                     <a href="{% url 'Author:DeletePost' post.id%}"><span class="text-danger fa fa-trash-o"  style="font-size:24px; margin-left:25px;"></span></a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <!-- .col -->
+    <!--- recent comments-->
+    <div class="col-md-12 ">
+        <div class="white-box">
+            <h3 class="box-title">Pending Comments &nbsp; <sup><span class="badge btn-primary">{{comments|Pending|length}}</span></h3></sup>
+            <div class="comment-center p-t-10">
+                {% if comments %}
+                    {% for comment in comments|Pending %}
+            
+                        <div class="comment-body {% if forloop.last %}b-none{% endif %}" >
+                            <div class="user-img"> <img src="{{comment.author.photo.url}}" alt="user{{forloop.counter}}" class="img-circle" style="width:40px !important; height:40px !important;">
+                            </div>
+                            <div class="mail-contnet">
+                                <h4>{{comment.author.name}} &nbsp; | &nbsp;{% if comment.post.title|length  < 90 %}
+                                    {{comment.post.title}}
+                                    {% else %}{{comment.post.title|truncatechars:87}}...
+                                    {% endif %}
+                                </h4>
+                                <span class="time">{{comment.created_on}}</span>
+                                <br/>
+                                <h5 style='margin-top:8px;'><b>{{comment.title}}</b></h5>
+                                <span class="mail-desc" >{{comment.content}}</span>
+                                <a href="{% url 'Author:Approve' comment.id "c" %}" class="btn btn-rounded btn-default btn-outline m-r-5 btn-success"><i class="ti-check text-success m-r-5"></i>Approve</a>
+                                <a href="{% url 'Author:Reject' comment.id "c" %}" class="btn-rounded btn btn-default btn-outline btn-danger"><i class="ti-close text-danger m-r-5"></i> Reject</a>
+                            </div>
+                        </div>
+                    
+                    {% endfor%}
+                {% endif%}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 ">
+        <div class="white-box">
+            <h3 class="box-title">Pending Sub-Comments  &nbsp; <sup><span class="badge btn-primary">{{subcomments|Pending|length}}</span> </h3>
+            <div class="comment-center p-t-10">
+                {% if subcomments %}
+                    {% for comment in subcomments|Pending %}
+                        <div class="comment-body {% if forloop.last %}b-none{% endif %}">
+                            
+                            <div class="user-img"> <img src="{{comment.author.photo.url}}" alt="user{{forloop.counter}}" class="img-circle" style="width:40px !important; height:40px !important;">
+                            </div>
+                            <div class="mail-contnet">
+                                <h4>{{comment.author.name}}</h4><span class="time">{{comment.created_on}}</span>
+                                <br/>
+                                <h5><b>{{comment.title}}</b></h5>
+                                <span class="mail-desc">{{comment.content}}</span>
+                                <a href="{% url 'Author:Approve' comment.id "s" %}" class="btn btn-rounded btn-default btn-outline m-r-5 btn-success">Approve</a>
+                                <a href="{% url 'Author:Reject'  comment.id "s" %}" class="btn-rounded btn btn-default btn-outline btn-danger"> Reject</a>
+                            </div>
+                        </div>
+                    {% endfor%}
+                {% endif%}
+            </div>
+        </div>
+    </div>
+    <!-- /.col -->
+</div>
+
+
+{% endblock %}

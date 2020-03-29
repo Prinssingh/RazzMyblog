@@ -1,0 +1,196 @@
+{% extends "main/index.html" %} 
+{% load tags %} 
+ {% load static %}
+{% block top_stories_section %} {% endblock %}
+ {% block post_slider_section %}
+
+<section class="banner-area relative">
+    <div class="overlay overlay-bg">
+
+    </div>
+    <div class="container box_1170">
+        <div class="row d-flex align-items-center justify-content-center">
+            <div class="about-content col-lg-12">
+                <h1 class="text-white">
+                    Post Details
+                </h1>
+                <p class="text-white link-nav"><a href="#">Home </a> <span class="lnr lnr-arrow-right"></span>
+                    <a href="#"> Blog Details</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block post_area %}
+
+<div class="col-lg-8" id="details">
+    <div class="main_blog_details">
+        <img class="img-fluid" src="{{post.image.url}}" alt="post"><br><br>
+        <h1>{{post.title}}</h1><br>
+        <div class="user_details">
+            <div class="float-left">
+                {% for tag in tagged %}
+                 <a href="#">{{tag.name}}</a>
+                {% endfor %}
+            </div>
+            <div class="float-right">
+                <div class="media">
+                    <div class="media-body">
+                        <h5>{{post.author.name}}</h5>
+                        <p>{{post.created_on}}</p>
+                    </div>
+                    <div class="d-flex">
+
+                        <img src="{{post.author.photo.url}}" alt="blogerImg" class="rounded-circle" width="40" height="40">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- blog body starts-->
+        <div class="post">{{post.content|safe}}</div>
+        <!-- blog body end -->
+        <div class="news_d_footer">
+            <div id="like"> Like Here &nbsp;<i class="fa fa-heart-o" style="font-size:20px; color:red;" id="heart"></i> &nbsp; &nbsp;
+                <span id="cn">{{post.getLikes}}</span> people like this</div>
+            <a class="justify-content-center ml-auto" href="#comment"><i class="lnr lnr lnr-bubble"></i>{{post.reviews|ApprovedLen}}
+                 Comments</a>
+            <div class="news_socail ml-auto" style="position:fixed;">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+                <a href="#"><i class="fa fa-pinterest"></i></a>
+                <a href="#"><i class="fa fa-rss"></i></a>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <!-- navigation area -->
+    <div class="navigation-area">
+        <div class="row">
+            <!-- Previous Post -->
+            {% if previous %}
+            <div class="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center">
+                <div class="thumb">
+                    <a href="#"><img class="img-fluid" src="{{previous.image.url}}" alt="Previous post" style="width=60px  !important; height:60px;  !important;"></a>
+                </div>
+                <div class="arrow">
+                    <a href="#"><span class="lnr text-white lnr-arrow-left"></span></a>
+                </div>
+                <div class="detials">
+                    <a href="{% url 'Blog:PostDetails' previous.id previous.slug %}">
+                        <p>Prev Post</p>
+                    </a>
+                    <a href="{% url 'Blog:PostDetails' previous.id previous.slug %}">
+                        <h4>{% if previous.title|length < 20 %}{{post.previous.title}} {% else %}{{previous.title|truncatechars:20}}...{% endif %}</h4>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            <!----------------------->
+            <!-- Next Post -->
+            {% if next %}
+            <div class="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
+                <div class="detials">
+                    <a href="{% url 'Blog:PostDetails' next.id next.slug %}">
+                        <p>Next Post</p>
+                    </a>
+                    <a href="{% url 'Blog:PostDetails' next.id next.slug %}">
+                        <h4>{% if next.title|length < 20 %}{{next.title}} {% else %}{{next.title|truncatechars:20}}...{% endif %}</h4>
+                    </a>
+                </div>
+                <div class="arrow">
+                    <a href="{% url 'Blog:PostDetails' next.id next.slug %}"><span class="lnr text-white lnr-arrow-right"></span></a>
+                </div>
+                <div class="thumb">
+                    <a href="{% url 'Blog:PostDetails' next.id next.slug %}"><img class="img-fluid" src="{{next.image.url}}" alt="" style="width=60px  !important; height:60px;  !important;"></a>
+                </div>
+            </div>
+
+            {% endif %}
+
+            <!------------------------>
+        </div>
+    </div>
+
+    <div class="comments-area" style="overflow: auto;">
+        <h4>{{post.reviews|ApprovedLen}} Comments</h4>
+        <!-- Comment 1---->
+        <!-- Comment area ---->
+        {% if current.reviews.all %} {% for comment in current.reviews.all %} {% if comment.status == "Approved" %}
+        <div class="comment-list">
+            <div class="single-comment justify-content-between d-flex">
+                <div class="user justify-content-between d-flex">
+                    <div class="thumb">
+                        <img src="{{comment.author.photo.url}}" alt="user" class="rounded-circle" style="width:80px !important; height:80px !important;">
+                    </div>
+                    <div class="desc">
+                        <h5><a href="#">{{comment.author.name}}</a></h5>
+                        <p class="date">{{comment.created_on|date:'F j, Y'}} at {{comment.created_on|date:'i:h'}}
+                        </p>
+                        <!--December 4, 2017 at 3:12 pm-->
+                        <p class="comment">
+                            <strong>{{comment.title}}</strong><br> {{comment.content}}
+
+                        </p>
+                    </div>
+                </div>
+                <div class="reply-btn">
+
+                    <a>
+                        <p>{{comment.child|ApprovedLen}} Reply</p><button type="button" class="btn-reply text-uppercase" id="{{comment.id}}" onclick="reply(this);">reply</button></a>
+                </div>
+            </div>
+        </div>
+
+        {% if comment.child.all %} {% for sub_comment in comment.child.all %} {% if sub_comment.status == "Approved" %}
+        <div class="comment-list left-padding" style="padding-left:80px;">
+            <div class="single-comment justify-content-between d-flex">
+                <div class="user justify-content-between d-flex">
+                    <div class="thumb">
+                        <img src="{{sub_comment.author.photo.url}}" alt="author" class="rounded-circle" style="width:60px !important; height:60px !important;">
+                    </div>
+                    <div class="desc">
+                        <h5><a href="#">{{sub_comment.author.name}}</a></h5>
+                        <p class="date"> {{comment.created_on|date:'F j, Y'}} at {{comment.created_on|date:'i:h'}} </p>
+                        <p class="comment">
+                            {{sub_comment.title}}<br> {{sub_comment.content}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endif %} {% endfor %} {% endif%}
+
+    </div>
+
+    <!---------------------------------------------->
+    <!--- Comment Form ---->
+    <div class="comment-form" id="comment">
+        <span style="float:right; font-size:20px; position:relative;right:525px;"> <b id="reply1"></b></span>
+        <h4>Leave a Comment :</h4>
+        <form action="{% url 'Blog:comment'  %}" method="post" id="mycommentform">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" onfocus="if (!window.__cfRLUnblockHandlers) return false; this.placeholder = ''" onblur="if (!window.__cfRLUnblockHandlers) return false; this.placeholder = 'Subject'"
+                    data-cf-modified-6db44a4414726967767fd5b4-="">
+                <input type="hidden" name="user_id" value="{% if " RazzMyBlog_user_id " in request.session %}{{request.session.RazzMyBlog_user_id}}{% else %}NOT{% endif %}" id="user">
+                <input type="hidden" name="post_id" value="{{current.id}}" id="post_id">
+                <input type="hidden" id="commentid" name="commentid" value='prins'>
+                <input type="hidden" name="pre_request" value="{{request.path}}">
+
+
+            </div>
+            <div class="form-group">
+                <textarea class="form-control mb-10" rows="5" name="message" id="content" maxlength="200" placeholder="Messege in 200 characters" onfocus="if (!window.__cfRLUnblockHandlers) return false; this.placeholder = ''" onblur="if (!window.__cfRLUnblockHandlers) return false; this.placeholder = 'Messege in 200 characters'"
+                    required></textarea>
+            </div>
+            <a>
+
+                <button type="button" class="primary-btn submit_btn text-uppercase" id="addComment">Send Message</button></a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

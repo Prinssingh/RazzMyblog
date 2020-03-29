@@ -1,0 +1,1226 @@
+{% extends 'MyAdmin/index.html'%}
+{% load static %}
+{% load tags%}
+{% block style  %}
+<!-- DataTables CSS -->
+<link href="{% static "MyAdmin/css/dataTables/dataTables.bootstrap.css" %}" rel="stylesheet">
+
+<!-- DataTables Responsive CSS -->
+<link href="{% static "MyAdmin/css/dataTables/dataTables.responsive.css" %}"  rel="stylesheet">
+<style>
+        .ajax-loader {
+        visibility: hidden;
+        background-color: rgba(255,255,255,0.7);
+        position: absolute;
+        z-index: +100 !important;
+        width: 100%;
+        height:100%;
+        }
+
+        .ajax-loader img {
+        position: relative;
+        top:40%;
+        left:40%;
+        }
+        td{font-weight: bold; max-width:200px;}
+        
+    </style>
+
+{% endblock  %}
+
+<!-- Main Body -->
+{% block body%}
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12" style="margin-top:8px;">
+                <div class="col-lg-12 col-lg-6"><h1 class="page-header" >Data Tables</h1></div><div class="col-lg-12 col-lg-6"><h1 class="page-header" style="text-align:right;">Total : 09</h1></div>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="panel-body">
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                           1.  <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><b class="text-primary">Author's Table : <span class="badge" style="margin-top:-5px;">{{authors|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-1">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Name</th>
+                                                        <th class="text-primary">Total Posts</th>
+                                                        <th  class="text-primary">Approved</th>
+                                                        <th  class="text-primary">Pending</th>
+                                                        <th  class="text-primary">Submitted</th>
+                                                        <th  class=" text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if authors %}
+                                                    {% for author in authors  %}
+                                                    <tr >
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{author.name}}</td>
+                                                        <td class="text-primary">{{author.posted.all|length}}</td>
+                                                        <td class="text-success">{{author.posted|ApprovedLen}}</td>
+                                                        <td class="text-danger">{{author.posted|PendingLen}}</td>
+                                                        <td class="text-danger">{{author.posted|SubmittedLen}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{author.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#edit{{author.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:10px;color:blue;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{author.id}}"><i class="fa fa-whatsapp" style="font-size:20px;margin-left:10px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete Author : {{author.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{author.name}} ?? <br>
+                                                                        He has Posted {{author.posted.all|length}}  Posts, will also be deleted
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" value="{{author.id}}" onclick="delFunct(this,'User');">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade" id="edit{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-warning" id="myModalLabel">Remove The Author Permissions for {{author.name}} </h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                            Do you really want to demote {{author.name}} ??<br>
+                                                                            He has posted {{author.posted.all|length}} Posts.<br>
+                                                                            {% if author.posted|TopPost %}                                                                                 
+                                                                                    Including : <br>"{{author.posted|TopPost|index:"0"}}",which has {{author.posted|TopPost|index:"1"}} likes and {{author.posted|TopPost|index:"2"}} views ??
+                                                                            {% endif %}
+                                                                           
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-warning"  value="{{author.id}}" onclick="updateUser(this,'Demote');">Update</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{author.name}}</h3>
+                                                                        </div>
+                                                                                                                                              
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                           
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{author.id}}" onclick="sendMessage(this);" >Send</button>
+                                                                        </div>
+                                                                        
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            2. <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"><b class="text-primary">User's Table : <span class="badge" style="margin-top:-5px;">{{users|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-2">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Name</th>
+                                                        <th class="text-primary">User Name</th>
+                                                        <th  class="text-primary">Email</th>
+                                                        <th  class="text-primary">Mobile</th>
+                                                        <th  class="text-primary">Post Liked</th>
+                                                        <th  class=" text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if users %}
+                                                    {% for user in users  %}
+                                                    <tr  id="Urow{{user.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{user.name}}</td>
+                                                        <td class="text-primary">{{user.user_id}}</td>
+                                                        <td class="text-success">{{user.email}}</td>
+                                                        <td class="text-danger">{{user.mobile}}</td>
+                                                        <td class="text-danger">{{user.liked.all|length}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{user.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{user.id}}"><i class="fa  fa-plus-square" style="font-size:20px;margin-left:10px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete User : {{user.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{user.name}} ?? <br>
+                                                                        He has Liked {{user.liked|length}}  Posts, will cause reduction on likes
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" value="{{user.id}}" onclick="delFunct(this,'User');">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-Warning" id="message{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Update {{user.name}} To write blogs??</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to upgrade to {{user.name}} to write blogs in your site??
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-warning" value="{{user.id}}" onclick="updateUser(this,'Promote');" >Upgrade</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                           3.  <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree"><b class="text-primary">Post/Blog Table : <span class="badge" style="margin-top:-5px;">{{posts|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-3">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Author</th>
+                                                        <th  class="text-primary">Date & Time</th>
+                                                        <th  class="text-primary">Likes</th>
+                                                        <th  class="text-primary">Views</th>
+                                                        <th  class="text-primary">Status</th>
+                                                        <th  class="text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if posts %}
+                                                    {% for post in posts  %}
+                                                    <tr  id="Prow{{post.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{post.title}}</td>
+                                                        <td class="text-primary">{{post.author.name}}</td>
+                                                        <td class="text-success">{{post.created_on}}</td>
+                                                        <td class="text-danger">{{post.likes.all|length}}</td>
+                                                        <td class="text-danger">{{post.views}}</td>
+                                                        <td class="text-{% if  post.status == "Pending" %}warning{% elif post.status == "Approved"%}success{% elif post.status == "Rejected"%}danger{% else %}primary{% endif %} ">{{post.status}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="{% url 'MyAdmin:Preview'%}?id={{post.id}}" target="_blank" ><i class="fa fa-eye " style="font-size:20px;margin-left:10px; color:#f5aa42;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{user.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#edit{{author.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:10px;color:blue;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{user.id}}"><i class="fa fa-whatsapp" style="font-size:20px;margin-left:10px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete User : {{user.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{user.name}} ?? <br>
+                                                                        He has Liked {{user.liked|length}}  Posts, will cause reduction on likes
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{user.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade" id="edit{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-warning" id="myModalLabel">Remove The Author Permissions for {{author.name}} </h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                            Do you really want to demote {{author.name}} ??<br>
+                                                                            He has posted {{author.posted.all|length}} Posts.<br>
+                                                                            {% if author.posted %}                                                                                 
+                                                                                    Including : "{{author.posted}}",which has 200 likes and 3000 views ??
+                                                                            {% endif %}
+                                                                           
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-warning"  id="{{author.id}}" onclick="demoteAuthor(this);">Update</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{user.name}}</h3>
+                                                                        </div>
+                                                                        <form role="form"  Action="{% url 'MyAdmin:Message' %}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                            <input type="hidden" name='id',value='{{author.id}}'>
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{user.id}}" >Send</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                           4.  <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><b class="text-primary">Category Table : <span class="badge" style="margin-top:-5px;">{{categories|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseFour" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-4">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Total Posts</th>
+                                                        <th  class="text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if categories %}
+                                                    {% for category in categories  %}
+                                                    <tr  id="Crow{{category.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{category.name}}</td>
+                                                        <td class="text-primary">{{category.posts.all|length}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{user.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{user.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:20px;color:blue;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete User : {{user.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{user.name}} ?? <br>
+                                                                        He has Liked {{user.liked|length}}  Posts, will cause reduction on likes
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{user.id}}">Edit</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{user.name}}</h3>
+                                                                        </div>
+                                                                        <form role="form"  Action="{% url 'MyAdmin:Message' %}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                            <input type="hidden" name='id',value='{{author.id}}'>
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{user.id}}" >Send</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                            <button type="button" class="btn btn-success" data-dismiss="modal">Add New Category</button>
+                                            
+                                        </div>
+
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                         5.    <a data-toggle="collapse" data-parent="#accordion" href="#collapseFive"><b class="text-primary">Tag Table : <span class="badge" style="margin-top:-5px;">{{tags|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseFive" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-5">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Total Posts</th>
+                                                        <th  class="text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if tags %}
+                                                    {% for tag in tags  %}
+                                                    <tr  id="Trow{{tag.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{tag.name}}</td>
+                                                        <td class="text-primary">{{tag.posts.all|length}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{user.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{user.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:20px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete User : {{user.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{user.name}} ?? <br>
+                                                                        He has Liked {{user.liked|length}}  Posts, will cause reduction on likes
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{user.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{user.name}}</h3>
+                                                                        </div>
+                                                                        <form role="form"  Action="{% url 'MyAdmin:Message' %}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                            <input type="hidden" name='id',value='{{author.id}}'>
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{user.id}}" >Send</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                            <button type="button" class="btn btn-success" >Add New Tag</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                           6.  <a data-toggle="collapse" data-parent="#accordion" href="#collapseSix"><b class="text-primary">Subscriber's Table : <span class="badge" style="margin-top:-5px;">{{subscribers|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseSix" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-6">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Email</th>
+                                                        <th  class="text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if subscribers %}
+                                                    {% for subscriber in subscribers  %}
+                                                    <tr  id="Subsrow{{subscriber.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{subscriber.email}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{user.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{user.id}}"><i class="fa fa-whatsapp" style="font-size:20px;margin-left:10px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete User : {{user.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{user.name}} ?? <br>
+                                                                        He has Liked {{user.liked|length}}  Posts, will cause reduction on likes
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{user.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{user.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{user.name}}</h3>
+                                                                        </div>
+                                                                        <form role="form"  Action="{% url 'MyAdmin:Message' %}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                            <input type="hidden" name='id',value='{{author.id}}'>
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{user.id}}" >Send</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                            <button type="button" class="btn btn-success" >Send New Updates to all</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                          7.   <a data-toggle="collapse" data-parent="#accordion" href="#collapseSeven"><b class="text-primary">Comment's Table : <span class="badge" style="margin-top:-5px;">{{comments|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseSeven" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-7">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Body</th>
+                                                        <th  class="text-primary">Author</th>
+                                                        <th  class="text-primary">Status</th>
+                                                        <th  class="text-primary">Reviews</th>
+                                                        <th  class=" text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if comments %}
+                                                    {% for comment in comments  %}
+                                                    <tr  id="Comentrow{{comment.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{comment.title}}</td>
+                                                        <td class="text-primary">{{comment.content}}</td>
+                                                        <td class="text-success">{{comment.author.name}}</td>
+                                                        <td class="text-danger">{{comment.status}}</td>
+                                                        <td class="text-danger">{{comment.child.all|length}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{author.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#edit{{author.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:10px;color:blue;"></i></a>
+                                                            
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete Author : {{author.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{author.name}} ?? <br>
+                                                                        He has Posted {{author.posted.all|length}}  Posts, will also be deleted
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{author.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade" id="edit{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-warning" id="myModalLabel">Remove The Author Permissions for {{author.name}} </h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                            Do you really want to demote {{author.name}} ??<br>
+                                                                            He has posted {{author.posted.all|length}} Posts.<br>
+                                                                            {% if author.posted %}                                                                                 
+                                                                                    Including : "{{author.posted}}",which has 200 likes and 3000 views ??
+                                                                            {% endif %}
+                                                                           
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-warning"  id="{{author.id}}" onclick="demoteAuthor(this);">Update</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                          8.  <a data-toggle="collapse" data-parent="#accordion" href="#collapseEight"><b class="text-primary">SubComment's Table : <span class="badge" style="margin-top:-5px;">{{subcomments|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseEight" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-8">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Body</th>
+                                                        <th  class="text-primary">Author</th>
+                                                        <th  class="text-primary">Status</th>
+                                                        <th  class="text-primary">Patent</th>
+                                                        <th  class=" text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if subcomments %}
+                                                    {% for comment in subcomments  %}
+                                                    <tr  id="Comentrow{{comment.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td>{{comment.title}}</td>
+                                                        <td class="text-primary">{{comment.content}}</td>
+                                                        <td class="text-success">{{comment.author.name}}</td>
+                                                        <td class="text-danger">{{comment.status}}</td>
+                                                        <td class="text-danger">{{comment.parent.title}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{author.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#edit{{author.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:10px;color:blue;"></i></a>
+                                                            
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete Author : {{author.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{author.name}} ?? <br>
+                                                                        He has Posted {{author.posted.all|length}}  Posts, will also be deleted
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{author.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade" id="edit{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-warning" id="myModalLabel">Remove The Author Permissions for {{author.name}} </h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                            Do you really want to demote {{author.name}} ??<br>
+                                                                            He has posted {{author.posted.all|length}} Posts.<br>
+                                                                            {% if author.posted %}                                                                                 
+                                                                                    Including : "{{author.posted}}",which has 200 likes and 3000 views ??
+                                                                            {% endif %}
+                                                                           
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-warning"  id="{{author.id}}" onclick="demoteAuthor(this);">Update</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                           9. <a data-toggle="collapse" data-parent="#accordion" href="#collapseNine"><b class="text-primary">Queries Table : <span class="badge" style="margin-top:-5px;">{{queries|length}}</sup></b></a>
+                        </h4>
+                    </div>
+                    <div id="collapseNine" class="panel-collapse collapse">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered table-hover" id="dataTables-9">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-primary">#</th>
+                                                        <th  class="text-primary">Author</th>
+                                                        <th class="text-primary">Title</th>
+                                                        <th class="text-primary">Body</th>
+                                                        <th  class="text-primary">Status</th>
+                                                        <th  class="text-primary">Solution</th>
+                                                        <th  class=" text-center text-primary">Action</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if queries %}
+                                                    {% for query in queries  %}
+                                                    <tr  id="Qrow{{query.id}}">
+                                                        <td class="text-muted">{{forloop.counter}}</td>
+                                                        <td class="text-success">{{query.name}}</td>
+                                                        <tdclass="text-primary">{{query.title}}</td>
+                                                        <td class="text-primary">{{query.content}}</td>
+                                                        <td class="text-danger">{{query.status}}</td>
+                                                        <td class="text-danger">{{query.solution}}</td>
+                                                        <td >
+                                                        <center>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#delete{{query.id}}"><i class="fa fa-trash text-danger" style="font-size:20px;margin-left:10px; color:red;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#edit{{query.id}}"><i class="fa fa-edit" style="font-size:20px;margin-left:10px;color:blue;"></i></a>
+                                                            <a href="JavaScript:Void(0);"  data-toggle="modal" data-target="#message{{query.id}}"><i class="fa fa-reply" style="font-size:20px;margin-left:10px;color:green;"></i></a>
+                                                        </center>
+                                                            <div class="modal fade" id="delete{{query.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-danger" id="myModalLabel">Delete Author : {{query.name}}</h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        Are you sure want to delete {{query.name}} ?? <br>
+                                                                        He has Posted {{author.posted.all|length}}  Posts, will also be deleted
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-danger" id="{{author.id}}" onclick="delAuthor(this);">Delete</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade" id="edit{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title text-warning" id="myModalLabel">Remove The Author Permissions for {{author.name}} </h3>
+                                                                        </div>
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                            Do you really want to demote {{author.name}} ??<br>
+                                                                            He has posted {{author.posted.all|length}} Posts.<br>
+                                                                            {% if author.posted %}                                                                                 
+                                                                                    Including : "{{author.posted}}",which has 200 likes and 3000 views ??
+                                                                            {% endif %}
+                                                                           
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="button" class="btn btn-warning"  id="{{author.id}}" onclick="demoteAuthor(this);">Update</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+
+                                                            <div class="modal fade text-success" id="message{{author.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                <div class="ajax-loader">
+                                                                 <img src="{% static 'loading5.gif'%}" class="img-responsive" />
+                                                                </div>
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                                            <h3 class="modal-title" id="myModalLabel">Send Message to {{author.name}}</h3>
+                                                                        </div>
+                                                                        <form role="form"  Action="{% url 'MyAdmin:Message' %}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <div class="modal-body" style="font-size:20px;">
+                                                                        <center>
+                                                                            <input type="hidden" name='id',value='{{author.id}}'>
+                                                                            <input class="form-control" placeholder="Message Title" name="title" required style="width:500px;">
+                                                                            <br><br>
+                                                                            <textarea class="form-control" rows="4" placeholder="Message Body" name="body" style="width:500px;"></textarea>
+                                                                            <br>
+                                                                        </center>    
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-success" value="{{author.id}}" >Send</button>
+                                                                        </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
+                                                            </div>
+                                                        
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    
+                                                    {% endfor %} 
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                </div>
+                                <!-- /.panel -->
+                            </div>
+                            <!-- /.col-lg-12 -->
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div> 
+    </div>
+</div>
+
+{% endblock  %}
+<!-- Scripts -->
+{% block data %}
+    <!-- DataTables JavaScript -->
+    <script src="{% static "MyAdmin/js/dataTables/jquery.dataTables.min.js" %}"></script>
+    <script src="{% static "MyAdmin/js/dataTables/dataTables.bootstrap.min.js" %} "></script>
+
+    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <script>
+     $(document).ready(function() {
+         
+        $('#dataTables-1, #dataTables-2, #dataTables-3, #dataTables-4, #dataTables-5,#dataTables-6,#dataTables-7,#dataTables-8, #dataTables-9').DataTable({
+                responsive: true
+        });
+        
+
+        delFunct= function(mydata,type){
+            $.ajax({url: "{% url 'MyAdmin:delfunction' %}",  
+                    success: function(result) { 
+                        alert("Deleted Success Fully!!");
+                        $(mydata).closest('tr').remove();
+                        },
+                    data:{"id":mydata.value,"type":type},
+                    error: function(error){alert("Error:"+error)},
+                    beforeSend: function(){
+                            $('.ajax-loader').css("visibility", "visible");
+                            },
+                    complete: function(){
+                        $('.ajax-loader').css("visibility", "hidden");
+                        }
+            }); 
+        }
+
+        updateUser= function(mydata,type){
+            $.ajax({url: "{% url 'MyAdmin:updateUser' %}",  
+                    success: function(result) { 
+                        alert("Update Success-ful!!");
+                        $(mydata).closest('tr').remove();
+                        },
+                    data:{"id":mydata.value,"type":type},
+                    error: function(error){alert("Error:"+error)},
+                    beforeSend: function(){
+                            $('.ajax-loader').css("visibility", "visible");
+                            },
+                    complete: function(){
+                        $('.ajax-loader').css("visibility", "hidden");
+                        }
+            }); 
+        }
+
+        sendMessage=function(mydata){
+            title=$(mydata).closest('.modal-body').find("input[name='title']").val();
+            body=$(mydata).closest('.modal-body').find("textarea[name='body']").val();
+            alert(title);
+            alert(body);
+            $.ajax({url: "{% url 'MyAdmin:Message' %}",  
+                    success: function(result) {alert("Message Send Success!!");},
+                    data:{"id":mydata.value,"title":title,"body":body},
+                    error: function(error){alert("Error:"+error)},
+                    beforeSend: function(){
+                            $('.ajax-loader').css("visibility", "visible");
+                            },
+                    complete: function(){
+                        $('.ajax-loader').css("visibility", "hidden");
+                        }
+            }); 
+        }
+
+        $(".panel-title").click(function(){
+                if ($(this).parent().siblings().find(".panel-collapse").hasClass( "in" )) {$(this).parent().siblings().find(".panel-collapse").removeClass( "in" );}
+                else {$(this).parent().siblings().find(".panel-collapse").addClass( "in" ); }
+            });
+
+        });
+    
+
+
+
+
+    </script>
+{% endblock data %}

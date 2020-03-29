@@ -1,0 +1,206 @@
+{% extends "main/Layout.html" %}
+{% load static %}
+<!--- Login ---->
+{% block login %}
+    {% if request.session.RazzMyBlog_user_name  %}
+        {{ request.session.RazzMyBlog_user_name}}
+    {% else %}
+        Login
+    {% endif %}
+{% endblock %}
+<!---- For categories in main page ---->
+{% block post_categories %}
+{% if category  %}
+    {% for cat in category %}
+        <li><a href="{% url 'Blog:categoryPost' cat.slug cat.id  1  %}" >{{cat.name }}</a></li>
+    {% endfor%}
+{% endif %}
+{% endblock %}
+
+{% block post_categories1 %}
+{% if category %}
+    {% for cat in category %}
+        <li>
+            <a href="{% url 'Blog:categoryPost' cat.slug cat.id  1  %}" class="justify-content-between align-items-center d-flex">
+             <p><img src="{% static 'main/img/bullet.png'%}" alt="&#8627;">{{cat.name}} ({{cat.ApprovedPostCount}})</p>
+            </a>
+        </li>
+    {% endfor%}
+{% endif %}
+{% endblock %}
+<!--================================================================================================================--->
+<!-----POST SLIDER---------->
+{% block post_slider_post %}
+    {% if top_stories %}
+        {% for post in top_stories %}
+            <div class="single-post-carousel">
+                        <div class="post-thumb">
+                            <img class="img-fluid" src="{{post.image.url}}" alt="post1" >
+                        </div>
+                        <div class="post-details">
+                            <h2><a href="{% url 'Blog:PostDetails' post.id post.slug %}">{% if post.title|length  < 40 %}
+                            {{post.title}}
+                            {% else %}{{post.title|truncatechars:38}}...
+                            {% endif %}</a></h2>
+                            <div class="post-content d-flex justify-content-between">
+                                <div class="post-meta">            
+                                    <div class="thumb"><img src="{{post.author.photo.url}}" alt="prins" class="rounded-circle"  style="width:50px !important; height:50px!important;"></div>
+                                    <div class="c-desc">
+                                        <h6>{{post.author.name}}</h6>
+                                        <p><span class="lnr lnr-calendar-full"></span> {{post.created_on|date:'dS M, Y'}}  </p>
+                                    </div>
+                                </div>
+                                <div class="details">
+                                    <p>{% if post.content|length < 150 %}{{funct.clean.post.content|safe}}
+                                    {% else %}  {{post.content|striptags|safe|truncatechars:150 }}...
+                                    {% endif %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+<!---------TAGS ------------>
+{% block Tags %}
+    {% if tags %}
+    {% for tag in tags %}
+        <li><a href="{% url 'Blog:tagPost' tag.slug tag.id   1 %}">{{tag.name}}</a></li>&nbsp;
+    {% endfor%}
+{% endif %}
+
+{% endblock %}
+<!-------------------------->
+<!---------popular posts ------------------>
+
+ {% block popular_post %}
+{% if popular_posts %}
+
+    {% for post in  popular_posts %}
+    <div class="single-popular-post d-flex flex-row">
+        <div class="popular-thumb">
+
+            <img class="img-fluid" src="{{post.image.url}}" alt="Latest-post{{forloop.counter}}" style="width:100px !important; height:80px!important;">
+        </div>
+        <div class="popular-details">
+            <h6><a href="{% url 'Blog:PostDetails' post.id post.slug %}">{% if post.title|length < 40 %}{{post.title}}
+            {% else %}  {{post.title|truncatechars:40}}...{% endif %}</a></h6>
+            <p>{{post.created_on.date}}</p>
+        </div>
+    </div>
+   {% endfor%}
+{% endif %}
+{% endblock %}
+
+
+<!-------Latest Posts ---->
+
+{% block Latest_posts %}
+{% if latest %}
+
+    {% for post in latest %}
+    <div class="single-popular-post d-flex flex-row">
+        <div class="popular-thumb">
+            <img class="img-fluid" src="{{post.image.url}}" alt="Latest-post{{forloop.counter}}" style="width:100px !important; height:80px!important;">
+        </div>
+        <div class="popular-details">
+            <h6><a href="{% url 'Blog:PostDetails' post.id post.slug %}">{% if post.title|length < 40 %}{{post.title}}
+            {% else %}  {{post.title|truncatechars:40}}...{% endif %}</a></h6>
+            <p>{{post.created_on.date}}</p>
+        </div>
+    </div>
+   {% endfor%}
+{% endif %}
+{% endblock %}
+
+<!----Post area-------------->
+{% block post_area1 %}
+{% if posts %}
+    {% for post in posts %}
+        <div class="col-lg-6 col-md-6">
+            <div class="single-post-item">
+                <div class="post-thumb">
+                   <img class="img-fluid" src="{{post.image.url}}" alt="post{{forloop.counter}}" style="width:350px !important; height:500px!important;">
+                </div>
+                <div class="post-details">
+                    <h4><a href="{% url 'Blog:PostDetails' post.id post.slug %}">{% if post.title|length < 48 %}{{post.title}}
+                                                    {% else %}  {{post.title|truncatechars:48}}...{% endif %}</a></h4>
+                    <p>{% if post.content|length < 150 %}{{post.content|striptags|safe }}
+                                    {% else %}  {{post.content|striptags|safe|truncatechars:150 }}...
+                                    {% endif %}</p>
+                    <div class="blog-meta">
+                        <a class="m-gap"><span class="lnr lnr-calendar-full"></span>{{post.created_on}}</a>
+                        <a  class="m-gap"><span class="lnr lnr-bubble"></span>{{post.reviews|length}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    {% endfor%}
+{% else %}
+<center><h2>Sorry!! No Result Found!!</h2></center>
+{% endif %}
+{% endblock %}
+
+<!------------------Pagination -------------->
+{% block pages %}
+{% if posts.has_other_pages %}
+    {% if posts.has_previous %}
+     <li class="page-item">
+     <a href="{{posts.previous_page_number }}" class="page-link" aria-label="Previous">
+            <span aria-hidden="true">
+                <span class="lnr lnr-arrow-left"></span>
+            </span>
+        </a>
+    </li>
+    {% else %}
+      <li class="page-item disabled">
+      <span class="lnr lnr-arrow-left"></span>
+    </li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if posts.number == i %}
+      <li class="page-item active"><a href="#" class="page-link">{% if i < 10  %} 0{{i}} {% else %}{{i}}{% endif %}</a></li>
+      {% else %}
+      <li class="page-item "><a href="{{i}}" class="page-link">{% if i < 10  %} 0{{i}} {% else %}{{i}}{% endif %}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+        <li class="page-item">
+            <a href="{{posts.next_page_number}}" class="page-link" aria-label="Next">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-arrow-right"></span>
+                </span>
+            </a>
+        </li>
+    {% else %}
+      <li class="page-item disabled">
+                <span aria-hidden="true">
+                    <span class="lnr lnr-arrow-right"></span>
+                </span>
+            </a>
+        </li>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+<!------------------Pagination -------------->
+
+<!--------------Top Stories ---------------------->
+{% block top_stories %}
+    {% if popular_posts%}
+        {% for post in popular_posts %}
+            <div class="single-stories-carousel d-flex align-items-center">
+                <div class="stories-thumb">
+                    <img class="img-fluid" src="{{post.image.url}}" alt="stories{{post.id}}" style="width:140px !important; height:80px!important;">
+                </div>
+                <div class="stories-details">
+                    <h6><a href="{% url 'Blog:PostDetails' post.id post.slug %}">{% if post.title|length < 40 %}{{post.title}}
+                                                    {% else %}  {{post.title|truncatechars:40}}...{% endif %}</a></h6>
+                    <p>{{post.created_on|date:'F d, Y'}}</p>
+                </div>
+            </div>
+
+        {% endfor %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "Author/Author.html" %} {% block page_title %}Edit Blog{% endblock %} {% block current_page%}Edit Blog {% endblock %} {% block admin_main_content %}
+
+<style>
+    #img1 {
+        width: 700px;
+        height: 400px;
+        background-color: white;
+        border: 2px solid;
+        background:url(/media/{{post.image}});
+        background-repeat: no-repeat;
+    }
+</style>
+<div class="white-box analytics-info">
+    <form class="form-horizontal form-material" method="post" enctype="multipart/form-data" action="{% url 'Author:Editblog' post.id %}" id="myform">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="col-md-12" style="font-size:24px; margin-bottom:10px;">TITTLE :</label>
+            <div class="col-md-12">
+
+                <input type="text" placeholder="BLOG TITLE HERE..." class="form-control form-control-lg form-control-line" value="{{post.title}}" name="blog_title" style="font-size:24px;" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="blog_image" class="col-md-12" style="font-size:24px; margin-bottom:10px;">BLOG IMAGE :</label><br>
+            <center>
+                <div id="img1"></div>
+            </center>
+
+            <div class="col-md-12" style="margin-top:50px;">
+                <input type="file" class="custom-file-input" name="blog_image" value="{{post.image}}" style="font-size:16px;" accept="image/*" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="blog_image" class="col-md-12" style="font-size:24px; margin-bottom:10px;">SELECT CATEGORIES :</label> {% if category %} {% for cat in category %}
+            <div class="col-md-12 col-md-3" style="font-size:16px;">
+                <input type="checkbox" class="form-check-input" name="categories" value="{{cat.id}}" {% if cat.id in pcid %} checked{% endif %}>&nbsp;{{cat.name}}
+            </div>
+            {% endfor%} {% endif %}
+        </div>
+        <hr>
+
+        <div class="form-group">
+            <label for="blog_image" class="col-md-12" style="font-size:24px; margin-bottom:10px;">SELECT TAGS :</label> {% if tags %} {% for tag in tags %}
+            <div class="col-md-12 col-md-2" style="font-size:16px;">
+                <input type="checkbox" class="form-check-input" name="tags" value="{{tag.id}}" {% if tag.id in ptid %} checked{% endif %}>&nbsp;{{tag.name}}
+            </div>
+            {% endfor %} {% endif %}
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="bodyofblog" class="col-md-12" style="font-size:24px; margin-bottom:10px;">BODY OF BLOG:</label>
+            <div class="col-md-12" style="font-size:16px;width:100%">
+                <!----------------------------------Tools-->
+                <div id="standalone-container" style="width:100%">
+                    <div id="toolbar-container" style="font-size:20px;">
+                        <span class="ql-formats">
+                  <select class="ql-font"></select>
+                  <select class="ql-size"></select>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-bold"></button>
+                  <button class="ql-italic"></button>
+                  <button class="ql-underline"></button>
+                  <button class="ql-strike"></button>
+                </span>
+                        <span class="ql-formats">
+                  <select class="ql-color"></select>
+                  <select class="ql-background"></select>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-script" value="sub"></button>
+                  <button class="ql-script" value="super"></button>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-header" value="3">H<sub>3</sub></button>
+                  <button class="ql-header" value="4">H<sub>4</sub></button>
+                  <button class="ql-header" value="5">H<sub>5</sub></button>
+                  <button class="ql-header" value="6">H<sub>6</sub></button>
+                </span>
+                        <span class="ql-formats">
+                    <button class="ql-blockquote"></button>
+                  <button class="ql-code-block"></button>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-list" value="ordered"></button>
+                  <button class="ql-list" value="bullet"></button>
+                  <button class="ql-indent" value="-1"></button>
+                  <button class="ql-indent" value="+1"></button>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-direction" value="rtl"></button>
+                  <select class="ql-align"></select>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-link"></button>
+                  <button class="ql-image"></button>
+                  <button class="ql-video"></button>
+                  <button class="ql-formula"></button>
+                </span>
+                        <span class="ql-formats">
+                  <button class="ql-clean"></button>
+                </span>
+                    </div>
+                    <div id="editor-container" style="font-size:20px;">{{post.content|safe}}</div>
+                </div>
+                <input type="hidden" name="content" id="content">
+                <input type="hidden" name="old_pic" value="{{post.image}}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-12 col-sm-6">
+                <center><button class="btn btn-primary" style="width:50%" disabled>Preview</button></center>
+
+            </div>
+            <div class="col-sm-12 col-sm-6">
+                <center>
+                    <button class="btn btn-success" onclick="show()" style="width:50%">Update</button>
+                </center>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+<code></code>

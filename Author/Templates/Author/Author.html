@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Prins singh">
+    <title>Author</title>
+    {% load static %}
+    {% load tags %}
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'Author/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Menu CSS -->
+    <link href="{% static 'Author/plugins/bower_components/sidebar-nav/dist/sidebar-nav.min.css' %}" rel="stylesheet">
+    <!-- toast CSS -->
+    <link href="{% static 'Author/plugins/bower_components/toast-master/css/jquery.toast.css' %}" rel="stylesheet">
+    <!-- morris CSS -->
+    <link href="{% static 'Author/plugins/bower_components/morrisjs/morris.css' %}" rel="stylesheet">
+    <!-- chartist CSS -->
+    <link href="{% static 'Author/plugins/bower_components/chartist-js/dist/chartist.min.css'%}" rel="stylesheet">
+    <link href="{% static 'Author/plugins/bower_components/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css'%}" rel="stylesheet">
+    <!-- animation CSS -->
+    <link href="{% static 'Author/css/animate.css'%}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'Author/css/style.css'%}" rel="stylesheet">
+    <!-- color CSS -->
+    <link href="{% static 'Author/css/colors/default.css'%}" id="theme" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+    <!--- Tool Bar---->
+    <link type="application/atom+xml" rel="alternate" href="{% static 'Author/css/feed.xml'%}" title="Quill - Your powerful rich text editor" />
+    <link rel="stylesheet" href="{% static 'Author/css/katex.min.css'%}" />
+    <link rel="stylesheet" href="{% static 'Author/css/monokai-sublime.min.css'%}" />
+    <link rel="stylesheet" href="{% static 'Author/css/quill.snow.css'%}" />
+    <style>
+   #standalone-container {
+    margin: 50px auto;
+    max-width: 100%;
+  }
+  #editor-container {
+    height: 500px;
+  }
+</style>
+</head>
+<body class="fix-header">
+{% block body %}
+    <!-- ============================================================== -->
+    <!-- Preloader -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Wrapper -->
+    <!-- ============================================================== -->
+    <div id="wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <nav class="navbar navbar-default navbar-static-top m-b-0" style='background-color: black; height:65px;'>
+            <div class="navbar-header">
+                </div>
+                <ul class="nav navbar-top-links navbar-right pull-right">
+                    <li>
+                        <form role="search" class="app-search hidden-sm hidden-xs m-r-10">
+                            <input type="text" placeholder="Search..." class="form-control"> <a href=""><i class="fa fa-search"></i></a> </form>
+                    </li>
+                    <li> 
+                        <a class="profile-pic" href="{% url 'Author:Profile'%}"> <img src="{{request.session.RazzMyBlog_user_photo}}" alt="user-img"  class="img-circle" style="width:40px !important; height:40px !important;">
+                            <b class="hidden-xs">{{request.session.RazzMyBlog_user_name}}</b></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- End Top Navigation -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <div class="navbar-default sidebar" role="navigation" style='margin-top:25px;'>
+            <div class="sidebar-nav slimscrollsidebar">
+                <div class="sidebar-head">
+                    <h3><span class="fa-fw open-close"><i class="ti-close ti-menu"></i></span> <span class="hide-menu">Navigation</span></h3>
+                </div>
+                <ul class="nav" id="side-menu">
+                    <li style="padding: 70px 0 0;">
+                        <a href="{% url 'Author:index' %}" class="waves-effect"><i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'Author:Profile' %}" class="waves-effect"><i class="fa fa-user fa-fw" aria-hidden="true"></i>Profile</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'Author:NewBlog'%}" class="waves-effect"><i class="fa fa-bold fa-fw" aria-hidden="true"></i>Add Blog</a>
+                    </li>
+        
+                    <li>
+                        <a href="{% url 'Author:Personal_Blogs'%}" class="waves-effect"><i class="fa fa-table fa-fw" aria-hidden="true"></i>Your Blogs</a>
+                    </li>
+                    <li style="margin-top:20px;">
+                        <a href="{% url "Blog:index" %}" class="waves-effect"><i class="fa fa fa-product-hunt fa-fw" aria-hidden="true"></i>Show Post</a>
+                    </li>
+
+                </ul>
+                <div class="center p-20">
+                </div>
+            </div>
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar -->
+        <div id="page-wrapper" style='margin-top:70px;'>
+           {% block FlashMSG %}
+                {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{message.tags}} alert-dismissible" role="alert" style='margin-top:10px;'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    {{message}} 
+                            </div>
+                        {% endfor %}
+                {% endif %}
+
+            {% endblock %}
+
+
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">{% block page_title %}Dashboard{% endblock %}</h4>
+                    </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                    <ol class="breadcrumb">
+                      <li><a href="{% url 'Author:index' %}">Dashboard</a></li>
+                      <li class="active">{% block current_page %} Dashboard{% endblock %}</li>
+                   </ol>
+              </div>
+
+                </div>
+                {% block admin_main_content %}
+                <div class="row">
+
+                    <!-- toatal views and subscribers -->
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Visit</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-success"></i> <span class="counter text-success">{{admin_data.visit}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Subscribers</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash2"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-purple"></i> <span class="counter text-purple">{{admin_data.subscribers |length}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Registered Users</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash3"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-info"></i> <span class="counter text-info">{{admin_data.Users |length}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Blogs Yearly Read</h3>
+                            <ul class="list-inline text-right">
+                                <li>
+                                    <h5><i class="fa fa-circle m-r-5 text-inverse"></i>Mac</h5> </li>
+                                <li>
+                                    <h5><i class="fa fa-circle m-r-5 text-info"></i>Windows</h5> </li>
+                            </ul>
+                            <div id="ct-visits" style="height: 405px;"></div>
+                        </div>
+                    </div>
+                </div>
+              
+                <div class="row">
+                    <!-- .col -->
+                    <!--- recent comments-->
+                    <div class="col-md-12 ">
+                        <div class="white-box">
+                            <h3 class="box-title">Recent Comments &nbsp; <sup><span class="badge btn-primary">{{comments|Submitted|length}}</span></h3></sup>
+                            <div class="comment-center p-t-10">
+                                {% if comments %}
+                                    {% for comment in comments|Submitted %}
+                            
+                                        <div class="comment-body {% if forloop.last %}b-none{% endif %}" >
+                                            <div class="user-img"> <img src="{{comment.author.photo.url}}" alt="user{{forloop.counter}}" class="img-circle" style="width:40px !important; height:40px !important;">
+                                            </div>
+                                            <div class="mail-contnet">
+                                                <h4>{{comment.author.name}} &nbsp; | &nbsp;{% if comment.post.title|length  < 90 %}
+                                                    {{comment.post.title}}
+                                                    {% else %}{{comment.post.title|truncatechars:87}}...
+                                                    {% endif %}
+                                                </h4>
+                                                <span class="time">{{comment.created_on}}</span>
+                                                <br/>
+                                                <h5 style='margin-top:8px;'><b>{{comment.title}}</b></h5>
+                                                <span class="mail-desc" >{{comment.content}}</span>
+                                                <a href="{% url 'Author:Approve' comment.id "c" %}" class="btn btn-rounded btn-default btn-outline m-r-5 btn-success"><i class="ti-check text-success m-r-5"></i>Approve</a>
+                                                <a href="{% url 'Author:Pending' comment.id "c" %}" class="btn-rounded btn btn-default btn-outline btn-warning"><i class="ti-close text-danger m-r-5"></i> Pending</a>
+                                                <a href="{% url 'Author:Reject' comment.id "c" %}" class="btn-rounded btn btn-default btn-outline btn-danger"><i class="ti-close text-danger m-r-5"></i> Reject</a>
+                                            </div>
+                                        </div>
+                                    
+                                    {% endfor%}
+                                {% endif%}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 ">
+                        <div class="white-box">
+                            <h3 class="box-title">Recent Sub-Comments  &nbsp; <sup><span class="badge btn-primary">{{subcomments|Submitted|length}}</span> </h3>
+                            <div class="comment-center p-t-10">
+                                {% if subcomments %}
+                                    {% for comment in subcomments|Submitted %}
+                                        <div class="comment-body {% if forloop.last %}b-none{% endif %}">
+                                            
+                                            <div class="user-img"> <img src="{{comment.author.photo.url}}" alt="user{{forloop.counter}}" class="img-circle" style="width:40px !important; height:40px !important;">
+                                            </div>
+                                            <div class="mail-contnet">
+                                                <h4>{{comment.author.name}}</h4><span class="time">{{comment.created_on}}</span>
+                                                <br/>
+                                                <h5><b>{{comment.title}}</b></h5>
+                                                <span class="mail-desc">{{comment.content}}</span>
+                                                <a href="{% url 'Author:Approve' comment.id "s" %}" class="btn btn-rounded btn-default btn-outline m-r-5 btn-success">Approve</a>
+                                                <a href="{% url 'Author:Pending' comment.id "s" %}" class="btn-rounded btn btn-default btn-outline btn-warning">Pending</a>
+                                                <a href="{% url 'Author:Reject'  comment.id "s" %}" class="btn-rounded btn btn-default btn-outline btn-danger"> Reject</a>
+                                            </div>
+                                        </div>
+                                    {% endfor%}
+                                {% endif%}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    {% endblock%}
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+
+            <footer class="footer text-center"> Copyright &copy;<script type="58f3f3aa93241e68fcc49acf-text/javascript">document.write(new Date().getFullYear());</script> All rights reserved by <a href="{% url "Blog:PrinsSingh"%}" target="_blank">Prins singh</a>.
+             </footer>
+        </div>
+
+
+
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Wrapper -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+    <script src="{% static 'Author/plugins/bower_components/jquery/dist/jquery.min.js'%}"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'Author/bootstrap/dist/js/bootstrap.min.js'%}"></script>
+    <!-- Menu Plugin JavaScript -->
+    <script src="{% static 'Author/plugins/bower_components/sidebar-nav/dist/sidebar-nav.min.js'%}"></script>
+    <!--slimscroll JavaScript -->
+    <script src="{% static 'Author/js/jquery.slimscroll.js'%}"></script>
+    <!--Wave Effects -->
+    <script src="{% static 'Author/js/waves.js'%}"></script>
+    <!--Counter js -->
+    <script src="{% static 'Author/plugins/bower_components/waypoints/lib/jquery.waypoints.js'%}"></script>
+    <script src="{% static 'Author/plugins/bower_components/counterup/jquery.counterup.min.js'%}"></script>
+    <!-- chartist chart -->
+    <script src="{% static 'Author/plugins/bower_components/chartist-js/dist/chartist.min.js'%}"></script>
+    <script src="{% static 'Author/plugins/bower_components/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.min.js'%}"></script>
+    <!-- Sparkline chart JavaScript -->
+    <script src="{% static 'Author/plugins/bower_components/jquery-sparkline/jquery.sparkline.min.js'%}"></script>
+    <!-- Custom Theme JavaScript -->
+    <script src="{% static 'Author/js/custom.min.js'%}"></script>
+    <script src="{% static 'Author/js/dashboard1.js'%}"></script>
+    <script src="{% static 'Author/plugins/bower_components/toast-master/js/jquery.toast.js'%}"></script>
+     <!----------tools---->
+<script src="{% static 'Author/js/katex.min.js'%}"></script>
+<script src="{% static 'Author/js/highlight.min.js'%}"></script>
+<script src="{% static 'Author/js/quill.min.js'%}"></script>
+<script>
+  var quill = new Quill('#editor-container', {
+    modules: {
+         toolbar: '#toolbar-container'
+    },
+    placeholder: 'Compose an POST.',
+    theme: 'snow'
+  });
+
+
+</script>
+<script>
+    $(document).ready(function(){
+    $("#tag").hide();
+    $("#cat").show();
+    $("#showcat").click(function(){
+                  $("#tag").hide();
+                  $("#cat").show();
+                  $(this).addClass('active');
+                  $("#showtag").removeClass('active');
+                                    });
+    $("#showtag").click(function(){
+                  $("#tag").show();
+                  $("#cat").hide();
+                  $(this).addClass('active');
+                  $("#showcat").removeClass('active');
+                                    });
+    });
+</script>
+<!----------New post---->
+<script>
+function show(){
+  var data= document.getElementsByClassName("ql-editor")
+  document.getElementById("content").value=data[0].innerHTML
+  document.getElementById("myform").submit()
+
+  }
+</script>
+{% endblock %}
+</body>
+
+
+</html>

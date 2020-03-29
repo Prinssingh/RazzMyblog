@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" href="{% static 'main/login/bootstrap.css'%}">
+    <script src="{% static 'main/login/jquery-3.4.1.min.js'%}" ></script>
+    <script src="{% static 'main/login/bootstrap.min.js'%}"></script>
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+form {border: 3px solid #f1f1f1;border-radius:20px; margin:80px;}
+
+input[type=text]{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius:20px;
+  font-size:16px;
+}
+
+button[type="submit"],button[type="button"]{
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius:20px;
+  font-size:16px;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+.cancelbtn {
+  color: white;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  border-radius:20px;
+  font-size:16px;
+  width: auto;
+  padding: 10px 18px;
+  background-color: #f44336;
+}
+.container1 {
+  padding: 16px;
+  border-bottom-left-radius:15px;
+  border-bottom-right-radius:15px;
+}
+label{float:left;}
+span.psw {
+  float: right;
+  padding-top: 16px;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+  span.psw {
+     display: block;
+     float: none;
+  }
+  .cancelbtn {
+     width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<!----Message Flashing area---->
+ {% if messages %}
+            {% for message in messages %}
+           <div class="alert alert-{{message.tags}} alert-dismissible" role="alert" style='margin-top:10px;'>
+                <button type="reset" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>{{message}}</strong> 
+            </div>
+            {% endfor %}
+    {% endif %}
+<!----End Message---->
+
+
+<center>
+
+<form action="{% url 'Blog:confirmOTP'  %}" method="post" style="width:500px;">
+{% csrf_token %}
+<h5 style="color:orange;margin-top:15px;"> For OTP check your Email. We have  already send you OTP .</h5>
+  <h2 style="color:blue;">Submit Your OTP </h2>
+  <div class="container1">
+    <input type="text" placeholder="Enter OTP" minlength="6" maxlength="6" id="otp" name="otp" onkeyup="this.value = this.value.toUpperCase();" pattern="[A-Z0-9]+" required >
+    <input type="hidden" name="id" value="{{id}}">
+    <button type="submit" id="submitFrom">Submit</button>
+  </div>
+  <div class="container1" style="background-color:#f1f1f1"><center>
+    <button type="reset" id="resend"class="cancelbtn" >Resend OTP</button>
+      <span id="countdown"></span></center>
+  </div>
+</form>
+
+</center>
+</body>
+<script>
+
+</script>
+</html>
+
+
